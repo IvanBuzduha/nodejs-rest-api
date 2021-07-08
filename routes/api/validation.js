@@ -1,26 +1,37 @@
 const Joi = require("joi");
+Joi.objectId = require("joi-objectid")(Joi);
+const mongoose = require('mongoose');
 
 const createContactSchema = Joi.object({
   name: Joi.string().min(3).max(30).required(),
   email: Joi.string().email().required(),
-  phone: Joi.number().greater(13).required(),
+  phone: Joi.string().required(),
+  favorite: Joi.boolean().optional(),
 });
 
 const updateContactSchema = Joi.object({
   name: Joi.string().alphanum().min(3).max(30).optional(),
   email: Joi.string().email().optional(),
-  phone: Joi.number().greater(13).optional(),
+  phone: Joi.string().optional(),
+   favorite: Joi.boolean().optional(),
+});
+idValidationSchema = Joi.object({
+  id: Joi.objectId(),
+});
+const updateStatusContactSchema = Joi.object({
+  favorite: Joi.boolean(),
 });
 
 const validate = (schema, obj, next) => {
-  const { error } = schema.validate(obj);
+  const { err } = schema.validate(obj);
 
-  if (error) {
-    const [{ message }] = error.details;
+  if (err) {
+    const [{ message }] = err.details;
 
     return next({
       status: 400,
-      message: `Not valid data`,
+      // message: `Not valid data`,
+      message: message
     });
   }
   next();
@@ -31,3 +42,11 @@ module.exports.createContact = (req, res, next) => {
 module.exports.updateContact = (req, res, next) => {
   return validate(updateContactSchema, req.body, next);
 };
+module.exports.updateStatusContact = (req, res, next) => {
+  return validate(updateStatusContactSchema, req.body, next);
+};
+module.exports.idValidation = (req, res, next) => {
+  return validate(idValidationSchema, req.body, next);
+};
+
+

@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const Contacts = require("../../service/contacts");
 const validate = require("./validation.js");
+const { asyncWrapper } = require("../../helpers/async-wrapper");
 
-router.get("/", async (req, res, next) => {
+router.get("/", asyncWrapper(async (req, res, next) => {
   try {
     const contacts = await Contacts.getListContacts();
 
@@ -17,16 +18,16 @@ router.get("/", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+}));
 
-router.get("/:id", async (req, res, next) => {
+router.get("/:id",validate.idValidation,  asyncWrapper(async (req, res, next) => {
   try {
     const contact = await Contacts.getContactById(req.params.id);
 
     if (contact) {
       return res.json({
         status: "success",
-        code: 200,
+        code: 200,        
         data: {
           contact,
         },
@@ -41,14 +42,15 @@ router.get("/:id", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+}));
 
-router.post("/", validate.createContact, async (req, res, next) => {
+router.post("/", validate.createContact, asyncWrapper(async (req, res, next) => {
   try {
     const contact = await Contacts.addContact(req.body);
     return res.status(201).json({
       status: "success",
       code: 201,
+      message: 'New contact has been added',
       data: {
         contact,
       },
@@ -56,9 +58,9 @@ router.post("/", validate.createContact, async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+}));
 
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", validate.idValidation, asyncWrapper(async (req, res, next) => {
   try {
     const contact = await Contacts.removeContact(req.params.id);
 
@@ -81,17 +83,18 @@ router.delete("/:id", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-});
+}));
 
-router.patch("/:id", validate.updateContact, async (req, res, next) => {
+router.patch("/:id", validate.updateContact, asyncWrapper(async (req, res, next) => {
   if (req.body) {
     try {
       const contact = await Contacts.updateContact(req.params.id, req.body);
 
       if (contact) {
-        return res.json({
+        return res.status(200).json({
           status: "success",
           code: 200,
+          message: 'contact updated',
           data: {
             contact,
           },
@@ -113,8 +116,42 @@ router.patch("/:id", validate.updateContact, async (req, res, next) => {
       message: "missing fields",
     });
   }
-});
-router.put("/:id", validate.updateContact, async (req, res, next) => {
+}));
+
+router.patch("/:id/favorite", validate.updateStatusContact, asyncWrapper( async (req, res, next) => {
+  if (req.body) {
+    try {
+      const contact = await Contacts.updateContact(req.params.id, req.body);
+
+      if (contact) {
+        return res.status(200).json({
+          status: "success",
+          code: 201,
+          message: 'status updated',
+          data: {
+            contact,
+          },
+        });
+      } else {
+        return res.status(404).json({
+          status: "error",
+          code: 404,
+          message: "Not found",
+        });
+      }
+    } catch (err) {
+      next(err);
+    }
+  } else {
+    return res.status(400).json({
+      status: "error",
+      code: 400,
+      message: "missing field favorite",
+    });
+  }
+}));
+
+router.put("/:id", validate.updateContact, asyncWrapper(async (req, res, next) => {
   if (req.body) {
     try {
       const contact = await Contacts.updateContact(req.params.id, req.body);
@@ -123,6 +160,7 @@ router.put("/:id", validate.updateContact, async (req, res, next) => {
         return res.json({
           status: "success",
           code: 200,
+          message: 'contact updated',
           data: {
             contact,
           },
@@ -144,6 +182,6 @@ router.put("/:id", validate.updateContact, async (req, res, next) => {
       message: "missing fields",
     });
   }
-});
+}));
 
 module.exports = router;
