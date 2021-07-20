@@ -1,10 +1,11 @@
 const Contacts = require("../service/contacts");
 const mongoose = require("mongoose");
+const { asyncWrapper } = require("../helpers/async-wrapper");
 
-const getContactsList = async (req, res, next) => {
+const getContactsList = asyncWrapper(async (req, res, next) => {
   try {
-    const contacts = await Contacts.getListContacts();
-
+    const userId = req.user.id;
+    const contacts = await Contacts.getContactsList(userId);
     return res.json({
       status: "success",
       code: 200,
@@ -15,11 +16,13 @@ const getContactsList = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+});
 
-const getContactById = async (req, res, next) => {
+const getContactById = asyncWrapper(async (req, res, next) => {
+   if (mongoose.Types.ObjectId.isValid(req.params.id)) {
   try {
-    const contact = await Contacts.getContactById(req.params.id);
+    const userId = req.user.id;
+    const contact = await Contacts.getContactById(req.params.id, userId);
 
     if (contact) {
       return res.json({
@@ -36,14 +39,23 @@ const getContactById = async (req, res, next) => {
         message: "Not Found",
       });
     }
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
-};
+}else {
 
-const addContact = async (req, res, next) => {
+    return res.status(400).json({
+      status: "error",
+      code: 400,
+      message: "Id doesn't exist",
+    });
+  }
+});
+
+const addContact = asyncWrapper(async (req, res, next) => {
   try {
-    const contact = await Contacts.addContact(req.body);
+    const userId = req.user.id;
+    const contact = await Contacts.addContact({...req.body, owner: userId});
 
     return res.status(201).json({
       status: "success",
@@ -53,14 +65,16 @@ const addContact = async (req, res, next) => {
         contact,
       },
     });
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
-};
+});
 
-const removeContact = async (req, res, next) => {
+const removeContact = asyncWrapper(async (req, res, next) => {
+  if (mongoose.Types.ObjectId.isValid(req.params.id)) {
   try {
-    const contact = await Contacts.removeContact(req.params.id);
+    const userId = req.user.id;
+    const contact = await Contacts.removeContact(req.params.id, userId );
 
     if (contact) {
       return res.json({
@@ -78,20 +92,28 @@ const removeContact = async (req, res, next) => {
         message: "Not Found",
       });
     }
-  } catch (err) {
-    next(err);
+  } catch (error) {
+    next(error);
   }
-};
+}else {
+    return res.status(404).json({
+    status: "error",
+    code: 404,
+    message: "Id doesn't exist",
+    });
+  }
+});
 
-const updateContact = async (req, res, next) => {
+const updateContact = asyncWrapper(async (req, res, next) => {
   if (req.body && mongoose.Types.ObjectId.isValid(req.params.id)) {
     try {
-      const contact = await Contacts.updateContact(req.params.id, req.body);
+      const userId = req.user.id;
+      const contact = await Contacts.updateContact( req.params.id, req.body, userId);
 
       if (contact) {
         return res.json({
           status: "success",
-          message: 'Contact has been updated',
+          message: 'Data has been updated',
           code: 200,
           data: {
             contact,
@@ -111,10 +133,11 @@ const updateContact = async (req, res, next) => {
     return res.status(400).json({
       status: "error",
       code: 400,
-      message: "such id does not exist",
+      message: "Id doesn't exist",
     });
   }
-};
+});
+
 
 module.exports = {
   getContactsList,
@@ -122,4 +145,5 @@ module.exports = {
   addContact,
   removeContact,
   updateContact,
+ 
 };
