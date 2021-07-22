@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const Users = require("../service/users");
 const { HttpCode } = require("../helpers/constants");
 require("dotenv").config();
+const findUser=require("../config/passport")
 
 const reg = async (req, res, next) => {
 
@@ -87,28 +88,14 @@ const logout = async (req, res, next) => {
 };
 
 const currentUser = async (req, res, next) => {
-
   try {
-
-    if (!req.user) {
-
-      return res.status(HttpCode.UNAUTHORIZED).json({
-        status: "error",
-        code: HttpCode.UNAUTHORIZED,
-        data: "UNAUTHORIZED",
-        message: "Not authorized",
-      });
-    }
-    const id = req.user.id;
-    const currentUser = await Users.findById(id);
-
     return res.status(HttpCode.OK).json({
       status: "success",
       code: HttpCode.OK,
       data: {
-        name: currentUser.name,
-        email: currentUser.email,
-        subscription: currentUser.subscription,
+        name: req.user.name,
+        email: req.user.email,
+        subscription: req.user.subscription,
       },
     });
   } catch (err) {
