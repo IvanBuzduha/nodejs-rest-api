@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const Users = require("../service/users");
 const { HttpCode } = require("../helpers/constants");
 require("dotenv").config();
-const findUser=require("../config/passport")
 
 const reg = async (req, res, next) => {
 
