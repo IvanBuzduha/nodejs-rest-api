@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Schema, model,} = mongoose;
+const { Schema, model, SchemaTypes } = mongoose;
 
 const contactSchema = new Schema(
   {
@@ -33,6 +33,20 @@ const contactSchema = new Schema(
     favorite: {
       type: Boolean,
       default: false,
+    },
+    subscription: {
+      type: String,
+    },
+    password: {
+      type: String,
+      require: [true, "Set password for contact"],
+    },
+    token: {
+      type: String,
+    },
+    owner: {
+      type: SchemaTypes.ObjectId,
+      ref: "user",
     },
   },
   { versionKey: false, 
