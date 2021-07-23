@@ -133,7 +133,7 @@ const saveAvatarToStatic = async (req) => {
   const file = await Jimp.read(filePath);
   await file.resize(250, 250).quality(70).writeAsync(filePath);
   await fs.rename(filePath, path.join(process.cwd(), 'public', 'avatars', folderForAvatar, avatarName));
-  const avatarURL = path.join(folderForAvatar, avatarName).replace('\\', '/');
+  avatarUrl = path.join(folderForAvatar, avatarName).replace('\\', '/');
   try {
     await fs.unlink(req.file.path)
     // console.log("after: ",req.file.path);
@@ -141,7 +141,7 @@ const saveAvatarToStatic = async (req) => {
     console.log(err.message);
   }
 
-  return avatarURL;
+  return avatarUrl;
 }
 
 
