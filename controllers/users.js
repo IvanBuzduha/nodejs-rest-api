@@ -109,7 +109,7 @@ const updateUserAvatar = async (req, res, next)=>{
 
   try {
     const id = req.user.id;
-    const avatarUrl = await saveAvatarToStatic(req);
+    const avatarUrl = await saveStatic(req);
     await Users.updateAvatar(id, avatarUrl);
 
     return res.json({
@@ -125,7 +125,7 @@ const updateUserAvatar = async (req, res, next)=>{
   }
 };
 
-const saveAvatarToStatic = async (req) => {
+const saveStatic = async (req) => {
   const folderForAvatar = req.user.id;    
   const filePath = req.file.path;
   // console.log("in begin: ",filePath);
@@ -138,7 +138,7 @@ const saveAvatarToStatic = async (req) => {
     await fs.unlink(req.file.path)
     // console.log("after: ",req.file.path);
   } catch (err) {
-    console.log(err.message);
+    // console.log(err.message);
   }
 
   return avatarUrl;
