@@ -2,6 +2,9 @@ const jwt = require("jsonwebtoken");
 const Users = require("../service/users");
 const { HttpCode } = require("../helpers/constants");
 require("dotenv").config();
+const fs = require('fs').promises;
+const path = require('path');
+const Jimp = require("jimp");
 
 const reg = async (req, res, next) => {
 
@@ -102,4 +105,44 @@ const currentUser = async (req, res, next) => {
   }
 };
 
-module.exports = { reg, login, logout, currentUser };
+const updateUserAvatar = async (req, res, next)=>{
+
+  try {
+    const id = req.user.id;
+    const avatarUrl = await saveAvatarToStatic(req);
+    await Users.updateAvatar(id, avatarUrl);
+
+    return res.json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: {
+        ...req.body,
+        avatarUrl,
+      }
+    })
+  } catch (err) {
+    next(err);
+  }
+};
+
+const saveAvatarToStatic = async (req) => {
+  const folderForAvatar = req.user.id;    
+  const filePath = req.file.path;
+  // console.log("in begin: ",filePath);
+  const avatarName = req.file.originalname;  
+  const file = await Jimp.read(filePath);
+  await file.resize(250, 250).quality(70).writeAsync(filePath);
+  await fs.rename(filePath, path.join(process.cwd(), 'public', 'avatars', folderForAvatar, avatarName));
+  const avatarURL = path.join(folderForAvatar, avatarName).replace('\\', '/');
+  try {
+    await fs.unlink(req.file.path)
+    // console.log("after: ",req.file.path);
+  } catch (err) {
+    console.log(err.message);
+  }
+
+  return avatarURL;
+}
+
+
+module.exports = { reg, login, logout, currentUser, updateUserAvatar };
