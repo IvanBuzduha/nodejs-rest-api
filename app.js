@@ -8,6 +8,7 @@ const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
+
 app.use(logger(formatsLogger));
 app.use(cors({ origin: process.env.ALLOWED_ORIGIN }));
 app.use(express.json());
@@ -20,7 +21,6 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
-  // console.log(err)
   res
     .status(err.status || 500)
     .json({ status: "fail", code: 500, message: err.message });

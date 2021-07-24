@@ -15,9 +15,11 @@ const updateContactSchema = Joi.object({
   phone: Joi.string().optional(),
    favorite: Joi.boolean().optional(),
 }).min(1);
+
 idValidationSchema = Joi.object({
   id: Joi.objectId(),
 });
+
 const updateStatusContactSchema = Joi.object({
   favorite: Joi.boolean(),
 });

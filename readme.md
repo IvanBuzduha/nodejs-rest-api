@@ -110,6 +110,28 @@ Authorization: "Bearer {{token}}"
     }
 ```
 
+#### Update user's avatar request
+
+```shell
+PATCH /users/avatars
+Content-Type: multipart/form-data
+Authorization: "Bearer {{token}}"
+RequestBody: 
+    form data: KEY- avatar | VALUE- Select Files
+```
+
+#### Update user's avatar success response
+
+```shell
+{
+    "status": "success",
+    "code": 200,
+    "data": {
+        "avatarUrl": "userID/FileName.jpg"
+    }
+}    
+```
+
 
 #### Get all contacts request
 

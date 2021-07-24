@@ -20,6 +20,7 @@ const getContactsList = asyncWrapper(async (req, res, next) => {
 
 const getContactById = asyncWrapper(async (req, res, next) => {
    if (mongoose.Types.ObjectId.isValid(req.params.id)) {
+     
   try {
     const userId = req.user.id;
     const contact = await Contacts.getContactById(req.params.id, userId);
@@ -43,7 +44,6 @@ const getContactById = asyncWrapper(async (req, res, next) => {
     next(error);
   }
 }else {
-
     return res.status(400).json({
       status: "error",
       code: 400,

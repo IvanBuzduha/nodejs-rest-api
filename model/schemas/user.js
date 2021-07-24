@@ -3,13 +3,16 @@ const bCrypt = require('bcryptjs')
 const { Subscription } = require("../../helpers/constants");
 const SALT_FACTOR = process.env.SALT_FACTOR;
 const Schema = mongoose.Schema
+const gravatar = require('gravatar');
 
 const userSchema = new Schema({
+
   name:{
       type: String,
       minlength: 3,
       default: 'Guest',
     },
+
   email: {
     type: String,
     required: [true, 'Email required'],
@@ -19,11 +22,20 @@ const userSchema = new Schema({
         return re.test(String(value).toLowerCase())
     }
   },
+
   password: {
     type: String,
     required: [true, 'Password required'],
   },
-subscription: {
+
+  avatarURL: {
+      type: String,
+      default: function(){
+        return gravatar.url(this.email,{s:'250'}, true);
+      }
+    },
+
+  subscription: {
     type: String,
     enum: {
         values: [Subscription.STARTER, Subscription.PRO, Subscription.BUZINESS],
@@ -31,12 +43,14 @@ subscription: {
     },
     default: Subscription.STARTER,
   },
+
   token: {
     type: String,
-    default:null,
+    default: null,
    },
  },
-    {versionKey:false,timestamps:true},
+    {versionKey: false, timestamps: true},
+    
 );
 
 userSchema.pre('save', async function (next) {

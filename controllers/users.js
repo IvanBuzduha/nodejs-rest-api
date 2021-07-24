@@ -2,6 +2,9 @@ const jwt = require("jsonwebtoken");
 const Users = require("../service/users");
 const { HttpCode } = require("../helpers/constants");
 require("dotenv").config();
+const fs = require('fs').promises;
+const path = require('path');
+const Jimp = require("jimp");
 
 const reg = async (req, res, next) => {
 
@@ -87,28 +90,14 @@ const logout = async (req, res, next) => {
 };
 
 const currentUser = async (req, res, next) => {
-
   try {
-
-    if (!req.user) {
-
-      return res.status(HttpCode.UNAUTHORIZED).json({
-        status: "error",
-        code: HttpCode.UNAUTHORIZED,
-        data: "UNAUTHORIZED",
-        message: "Not authorized",
-      });
-    }
-    const id = req.user.id;
-    const currentUser = await Users.findById(id);
-
     return res.status(HttpCode.OK).json({
       status: "success",
       code: HttpCode.OK,
       data: {
-        name: currentUser.name,
-        email: currentUser.email,
-        subscription: currentUser.subscription,
+        name: req.user.name,
+        email: req.user.email,
+        subscription: req.user.subscription,
       },
     });
   } catch (err) {
@@ -116,4 +105,44 @@ const currentUser = async (req, res, next) => {
   }
 };
 
-module.exports = { reg, login, logout, currentUser };
+const updateUserAvatar = async (req, res, next)=>{
+
+  try {
+    const id = req.user.id;
+    const avatarUrl = await saveStatic(req);
+    await Users.updateAvatar(id, avatarUrl);
+
+    return res.json({
+      status: 'success',
+      code: HttpCode.OK,
+      data: {
+        ...req.body,
+        avatarUrl,
+      }
+    })
+  } catch (err) {
+    next(err);
+  }
+};
+
+const saveStatic = async (req) => {
+  const folderForAvatar = req.user.id;    
+  const filePath = req.file.path;
+  // console.log("in begin: ",filePath);
+  const avatarName = req.file.originalname;  
+  const file = await Jimp.read(filePath);
+  await file.resize(250, 250).quality(70).writeAsync(filePath);
+  await fs.rename(filePath, path.join(process.cwd(), 'public', 'avatars', folderForAvatar, avatarName));
+  avatarUrl = path.join(folderForAvatar, avatarName).replace('\\', '/');
+  try {
+    await fs.unlink(req.file.path)
+    // console.log("after: ",req.file.path);
+  } catch (err) {
+    // console.log(err.message);
+  }
+
+  return avatarUrl;
+}
+
+
+module.exports = { reg, login, logout, currentUser, updateUserAvatar };
