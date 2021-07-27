@@ -4,7 +4,7 @@ const passport = require('passport');
 const { Strategy, ExtractJwt } = require('passport-jwt');
 
 const opts = {
-  secretOrKey: process.env.JWT_SECRET,
+    secretOrKey: process.env.JWT_SECRET,
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 };
 

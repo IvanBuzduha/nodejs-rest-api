@@ -1,4 +1,4 @@
-const Contact = require("../model/schemas/contact_schema");
+const Contact = require("../model/schemas/contact");
 
 const getContactsList = async (userId) => {
   const contacts = await Contact.find({owner: userId }).populate({

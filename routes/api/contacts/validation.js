@@ -32,7 +32,6 @@ const validate = (schema, obj, next) => {
 
     return next({
       status: 400,
-      // message: `Not valid data`,
       message: message
     });
   }

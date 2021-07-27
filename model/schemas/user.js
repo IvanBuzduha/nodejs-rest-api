@@ -4,6 +4,7 @@ const { Subscription } = require("../../helpers/constants");
 const SALT_FACTOR = process.env.SALT_FACTOR;
 const Schema = mongoose.Schema
 const gravatar = require('gravatar');
+const { nanoid } = require('nanoid')
 
 const userSchema = new Schema({
 
@@ -48,6 +49,14 @@ const userSchema = new Schema({
     type: String,
     default: null,
    },
+    verify: {
+    type: Boolean,
+    default: false,
+  },
+  verifyToken: {
+    type: String,
+    required: true,
+  }
  },
     {versionKey: false, timestamps: true},
     

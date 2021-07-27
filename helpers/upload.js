@@ -1,11 +1,12 @@
 const multer = require('multer');
 const path = require('path');
 require('dotenv').config();
-const uploadDir = path.join(process.cwd(), process.env.UPLOAD_DIR);
+const UPLOAD_DIR = path.join(process.cwd(), process.env.UPLOAD_DIR);
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
+  destination:UPLOAD_DIR,
+  function (req, file, cb) {
+    cb(null, UPLOAD_DIR);
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname);

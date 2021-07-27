@@ -48,6 +48,42 @@ ResponseBody: {
 }
 ```
 
+#### Verification request
+
+```shell
+GET /auth/verify/:verificationToken
+```
+
+#### Verification success response
+```shell
+{
+  "status": "success",
+  "code": 200,
+  "message": "Verification successfully!"
+}
+```
+
+#### Resending a email request
+
+```shell
+POST /users/verify
+Content-Type: application/json
+RequestBody: {
+  "email": "example@example.com"
+}
+```
+
+#### Resending a email success response
+```shell
+{
+    "status": "success",
+    "code": 200,
+    "data": {
+        "message": "Verification email resubmitted"
+    }
+}
+```
+
 #### Login request
 
 ```shell
