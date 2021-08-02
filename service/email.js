@@ -11,7 +11,7 @@ class EmailService {
             break
         case 'production': this.link = 'link to product'
             break
-        default:  this.link = 'http://localhost:3000'
+        default:  this.link = 'https://phonebook-ivan-bii33.netlify.app/'
             break
     }
   }
