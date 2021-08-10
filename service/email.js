@@ -7,11 +7,11 @@ class EmailService {
   #GenerateTemplate = Mailgen;
   constructor(env) {
     switch (env) {
-        case 'development': this.link = 'https://contacts-bii.herokuapp.com'
+        case 'development': this.link = 'https://phonebook-ivan-bii33.netlify.app'
             break
         case 'production': this.link = 'link to product'
             break
-        default:  this.link = 'https://phonebook-ivan-bii33.netlify.app'
+        default:  this.link = 'https://contacts-bii.herokuapp.com'
             break
     }
   }
