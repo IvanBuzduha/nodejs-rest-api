@@ -7,7 +7,7 @@ class EmailService {
   #GenerateTemplate = Mailgen;
   constructor(env) {
     switch (env) {
-        case 'development': this.link = 'https://phonebook-ivan-bii33.netlify.app'
+        case 'development': this.link = 'https://contacts-bii.herokuapp.com'
             break
         case 'production': this.link = 'link to product'
             break
